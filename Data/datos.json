@@ -1,0 +1,187 @@
+{
+  "rows": [
+    [
+      "Fecha Serial",
+      "Sede",
+      "Hora Inicio",
+      "Hora Fin",
+      "Tiempo Total (Segundos)",
+      "Tiempo Total (Decimal)",
+      "Tiempo HH:MM:SS",
+      "Región",
+      "Mes",
+      "Estado",
+      "Cantidad"
+    ],
+    /* DATOS DE NOVIEMBRE */
+    [
+      45233,
+      "Sede Centro",
+      "09:00:00",
+      "09:02:00",
+      120,
+      0.0013888888888889,
+      "00:02:00",
+      "Metropolitana",
+      "noviembre",
+      "sin conexion",
+      100
+    ],
+    [
+      45233.5,
+      "Sede Este",
+      "14:30:00",
+      "14:31:00",
+      60,
+      0.00069444444444444,
+      "00:01:00",
+      "Central",
+      "noviembre",
+      "sin conexion",
+      5
+    ],
+    [
+      45233.75,
+      "Sede Oeste",
+      "18:00:00",
+      "18:01:00",
+      60,
+      0.00069444444444444,
+      "00:01:00",
+      "Metropolitana",
+      "en linea",
+      1
+    ],
+    [
+      45234,
+      "Sede Centro",
+      "08:00:00",
+      "08:05:00",
+      300,
+      0.0034722222222222,
+      "00:05:00",
+      "Metropolitana",
+      "noviembre",
+      "sin conexion",
+      150
+    ],
+    [
+      45234,
+      "Sede Sur",
+      "12:00:00",
+      "12:00:30",
+      30,
+      0.00034722222222222,
+      "00:00:30",
+      "Oriental",
+      "noviembre",
+      "en linea",
+      0
+    ],
+    /* DATOS DE DICIEMBRE */
+    [
+      45265,
+      "Sede Centro",
+      "10:00:00",
+      "10:01:00",
+      60,
+      0.00069444444444444,
+      "00:01:00",
+      "Metropolitana",
+      "diciembre",
+      "sin conexion",
+      50
+    ],
+    [
+      45265.5,
+      "Sede Este",
+      "15:00:00",
+      "15:00:15",
+      15,
+      0.00017361111111111,
+      "00:00:15",
+      "Central",
+      "diciembre",
+      "en linea",
+      1
+    ],
+    [
+      45266,
+      "Sede Norte",
+      "11:00:00",
+      "11:05:00",
+      300,
+      0.0034722222222222,
+      "00:05:00",
+      "Occidental",
+      "diciembre",
+      "sin conexion",
+      20
+    ],
+    [
+      45266.5,
+      "Sede Oeste",
+      "16:00:00",
+      "16:02:00",
+      120,
+      0.0013888888888889,
+      "00:02:00",
+      "Metropolitana",
+      "sin conexion",
+      10
+    ],
+    [
+      45267,
+      "Sede Sur",
+      "09:00:00",
+      "09:03:00",
+      180,
+      0.0020833333333333,
+      "00:03:00",
+      "Oriental",
+      "diciembre",
+      "en linea",
+      1
+    ],
+    /* DATOS DE ENERO */
+    [
+      45695,
+      "Sede Centro",
+      "10:00:00",
+      "10:02:00",
+      120,
+      0.0013888888888889,
+      "00:02:00",
+      "Metropolitana",
+      "enero",
+      "sin conexion",
+      350
+    ],
+    [
+      45695.5,
+      "Sede Norte",
+      "11:00:00",
+      "11:01:00",
+      60,
+      0.00069444444444444,
+      "00:01:00",
+      "Occidental",
+      "enero",
+      "sin conexion",
+      2
+    ],
+    [
+      45696,
+      "Sede Este",
+      "12:00:00",
+      "12:00:30",
+      30,
+      0.00034722222222222,
+      "00:00:30",
+      "Central",
+      "enero",
+      "en linea",
+      1
+    ]
+  ]
+}
