@@ -1,0 +1,22 @@
+{
+  "rows": [
+    [
+      "FECHA",
+      "SEDE",
+      "DIRECCION",
+      "ESTADO_ACTUAL",
+      "ULTIMA_DESCONEXION",
+      "DESCONEXIONES_TEXTO",
+      "TIEMPO_TOTAL",
+      "REGION",
+      "MES",
+      "STATUS_REAL",
+      "CANTIDAD",
+      "TIEMPO"
+    ],
+    [45962, "Achaguas", "190.202.3.190", "en línea", "2025-11-03 20:19:00", "5 Veces", "0:34:54", "CENTRO", "noviembre", "en línea", 5, "00:34:54"],
+    [45962, "Comedor CENDIS", "186.167.10.146", "en línea", "2025-11-05 20:01:21", "0 Veces", "0:00:00", "MIRANDA", "noviembre", "en línea", 0, "00:00:00"],
+    [45962, "Forum Charallave", "181.208.26.162", "sin conexión", "2025-11-06 15:50:59", "2 Veces", "0:01:03", "CAPITAL", "noviembre", "sin conexión", 2, "00:01:03"],
+    [45962, "Forum Guatire", "186.167.1.58", "en línea", "2025-11-04 01:46:05", "0 Veces", "0:00:00", "MIRANDA", "noviembre", "en línea", 0, "00:00:00"]
+  ]
+}
