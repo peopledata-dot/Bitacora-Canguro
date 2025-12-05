@@ -8,7 +8,6 @@
     <script>
         const isAuthenticated = localStorage.getItem('isAuthenticated');
         if (isAuthenticated !== 'true') {
-            // Si no está autenticado, redirigir a la página de login
             window.location.href = 'login.html';
         }
     </script>
@@ -45,56 +44,43 @@
             background-attachment: fixed;
             min-height: 100vh;
         }
-
-        /* Aplicar un fondo semi-transparente a los contenedores principales para mejorar la legibilidad */
         .chart-box, .content-card {
             background-color: rgba(255, 255, 255, 0.95);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); 
         }
-
         .metric-card {
             padding: 1rem;
             border-radius: 0.5rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             color: white;
         }
-
-        /* Estilo para el nuevo encabezado (Top Bar) */
         .top-bar {
-            background-color: rgba(51, 51, 51, 0.9); /* Fondo oscuro semitransparente */
-            padding: 1rem 0; /* Relleno superior e inferior */
+            background-color: rgba(51, 51, 51, 0.9);
+            padding: 1rem 0;
             width: 100%;
-            position: sticky; /* Fija la barra arriba */
+            position: sticky;
             top: 0;
             z-index: 50;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-
-        /* FIN: ESTILOS PARA LA FACHADA DE FONDO */
-
         .chart-box canvas { 
             height: 300px !important; 
         }
-        
         .table-container {
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
             overflow-x: auto;
         }
-        
         #tablaDesconexion thead {
             background-color: #333333;
             color: white;
         }
-        
         #tablaDesconexion tbody tr:nth-child(even) {
             background-color: #f4f4f4;
         }
-        
-        /* Estilo para fila de alerta de alto promedio - Usando color de marca original */
         .alert-row td {
             background-color: #FFC107 !important; 
             color: #333333 !important; 
@@ -106,7 +92,6 @@
 
     <div class="top-bar">
         <div class="max-w-6xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-8 relative">
-            
             <div class="flex-grow flex justify-center">
                 <img 
                     src="logo-canguro.png" 
@@ -115,7 +100,6 @@
                     onerror="this.onerror=null; this.src='https://placehold.co/120x60/FFC107/333333?text=LOGO';"
                 />
             </div>
-
             <div class="absolute right-4 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 flex items-center space-x-3">
                 <p class="text-white text-sm hidden sm:block">
                     Bienvenido, <strong id="currentUser"></strong>
@@ -123,7 +107,7 @@
                 <button 
                     onclick="logout()"
                     class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg 
-                           shadow-lg text-sm transition duration-300"
+                            shadow-lg text-sm transition duration-300"
                 >
                     Cerrar sesión
                 </button>
@@ -169,7 +153,7 @@
                 <canvas id="graficoFechas"></canvas>
             </div>
             <div class="chart-box p-4 w-full lg:w-[48%] max-w-lg">
-                <h2 class="text-xl font-bold mb-4 text-center text-gray-800 border-b pb-2">Distribución de Estado de Conexión</h2>
+                <h2 class="text-xl font-bold mb-4 text-center text-gray-800 border-b pb-2">Distribución de Estado de Conexión (Sedes Únicas)</h2>
                 <canvas id="graficoEstado"></canvas>
             </div>
         </div>
@@ -191,7 +175,7 @@
                         <tr>
                             <th class="p-3 text-left">Sede</th>
                             <th class="p-3 text-center">Prom. Cantidad</th>
-                            <th class="p-3 text-center">Total Desconexión</th>
+                            <th class="p-3 text-center">Total Tiempo Desconexión</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -200,48 +184,38 @@
             </div>
         </div>
 
-    </div> <script>
-        // Función para cerrar la sesión
-        function logout() {
-            localStorage.removeItem('isAuthenticated');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-        }
-
-        // Mostrar usuario actual al cargar
-        document.getElementById('currentUser').textContent = localStorage.getItem('user') || 'Invitado';
-
+    </div> 
+    
+    <script>
         // --- CÓDIGO JAVASCRIPT DEL DASHBOARD (COMIENZA AQUÍ) ---
+
+        // Configuración y Variables
         let allRows = [];
         let chartFechas;
         let chartEstado;
         let chartRegion;
-
+        const API_URL = "http://localhost:3000/api/bitacora-data"; // <-- RUTA DE LA API DEL BACKEND
+        
         /** Mapeo de nombres de meses en español a números para orden cronológico. */
         const monthOrder = {
             "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
             "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
         };
 
-        /**
-         * Convierte el formato de fecha serial de Google Sheets (Epoch 1899-12-30) a un objeto Date de JS.
-         */
+        // --- Funciones Auxiliares (Se mantienen) ---
+        function logout() {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
         function sheetDateToJSDate(serial) {
             const epoch = new Date(1899, 11, 30);
-            return new Date(epoch.getTime() + serial * 86400000);
+            return new Date(epoch.getTime() + serial * 86400000); 
         }
-
-        /**
-         * Obtiene el objeto Date a partir del valor serial.
-         */
         function getDateObject(val) {
             if (!val || isNaN(Number(val))) return null;
-            return sheetDateToJSDate(Number(val));
+            return sheetDateToJSDate(Number(val) - 1); 
         }
-
-        /**
-         * Formatea segundos totales a HH:MM:SS.
-         */
         function formatSecondsToHms(totalSegundos) {
             const total = Math.round(totalSegundos);
             const hh = Math.floor(total / 3600);
@@ -250,26 +224,31 @@
             return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
         }
 
+        // --- LÓGICA CLAVE: CARGA DE DATOS DESDE EL BACKEND ---
+        
         /**
-         * Carga los datos iniciales y configura los selectores.
+         * Carga los datos iniciales y configura los selectores, ahora usando la API.
          */
         async function loadData() {
+            document.getElementById('currentUser').textContent = localStorage.getItem('user') || 'Invitado';
+
             try {
-                // NOTA: Este fetch debe ser resuelto por el entorno del servidor
-                const res = await fetch("./datos.json");
+                // *** Petición al Backend ***
+                const res = await fetch(API_URL); 
+                
+                if (!res.ok) {
+                    throw new Error(`Error ${res.status}. Asegúrate de que el backend (server.js) está corriendo.`);
+                }
+                
                 const json = await res.json();
                 allRows = json.rows;
+                
                 if (!allRows || allRows.length <= 1) {
-                    console.error("No se encontraron datos o el formato es incorrecto.");
-                    document.getElementById("indicadoresDiv").innerHTML = `
-                        <p class="col-span-2 text-center text-lg text-red-500 bg-red-100 p-4 rounded-lg">
-                            ⚠️ Error: No se pudieron cargar los datos o el archivo está vacío.
-                        </p>
-                    `;
-                    return;
+                    throw new Error("La API devolvió un set de datos vacío o mal formateado.");
                 }
 
                 // Obtener meses únicos (Columna I, índice 8)
+                // Usamos allRows.slice(1) para OMITIR los encabezados y evitar el error r[9].trim is not a function
                 const rows = allRows.slice(1);
                 const meses = [...new Set(
                     rows.map(r => (r[8] || "").trim().toLowerCase()).filter(m => m)
@@ -283,13 +262,11 @@
                 const mesSelect = document.getElementById("mesSelect");
                 mesSelect.innerHTML = "";
 
-                // Añadir opción "Global"
                 const optionGlobal = document.createElement("option");
                 optionGlobal.value = "global";
                 optionGlobal.textContent = "Global (Todos los Meses)";
                 mesSelect.appendChild(optionGlobal);
                 
-                // Añadir meses al selector
                 meses.forEach(m => {
                     const option = document.createElement("option");
                     option.value = m;
@@ -305,7 +282,6 @@
                     const selectedMes = mesSelect.value;
                     const selectedTipo = tipoSelect.value;
                     
-                    // Forzar a "global" si la agrupación es "global"
                     if (selectedTipo === "global" && selectedMes !== "global") {
                         mesSelect.value = "global";
                     }
@@ -315,21 +291,32 @@
 
                 mesSelect.addEventListener("change", handleFilterChange);
                 tipoSelect.addEventListener("change", handleFilterChange);
-                estadoFiltro.addEventListener("change", handleFilterChange);
-
+                estadoFiltro.addEventListener("change", () => renderTablaPorFiltro(mesSelect.value)); 
+                
                 // Renderizado inicial con la opción Global por defecto
                 renderChart("global", "lineal");
 
             } catch (error) {
                 console.error("Error al cargar los datos:", error);
+                // Aquí usamos el error genérico para mostrar el problema de conexión/estructura
+                document.getElementById("indicadoresDiv").innerHTML = `
+                    <p class="col-span-2 text-center text-lg text-red-700 bg-red-100 p-4 rounded-lg border border-red-300">
+                        ⚠️ **ERROR DE CONEXIÓN O PROCESAMIENTO DE DATOS.** Mensaje: ${error.message}
+                        <br>1. Asegúrate de que el servidor **'server.js'** está corriendo en ${API_URL}.
+                        <br>2. Verifica que el archivo **datos.json** no tiene comentarios.
+                    </p>
+                `;
             }
         }
 
+        // --- Funciones de Renderizado ---
+        
         /**
          * Renderiza el dashboard completo (gráficos y tabla) basado en los filtros.
          */
         function renderChart(mesSeleccionado, tipoAgrupacion) {
-            const rows = allRows.slice(1);
+            // ⬇️ CORRECCIÓN CLAVE: Omitir la fila de encabezados
+            const rows = allRows.slice(1); 
             
             const isGlobalView = tipoAgrupacion === "global" || mesSeleccionado === "global";
             const filteredRows = isGlobalView
@@ -337,6 +324,9 @@
                 : rows.filter(r => (r[8] || "").trim().toLowerCase() === mesSeleccionado.trim().toLowerCase());
 
             const finalTipoAgrupacion = isGlobalView ? "mes" : tipoAgrupacion;
+            const chartTitleType = isGlobalView 
+                ? "Mes" 
+                : finalTipoAgrupacion.charAt(0).toUpperCase() + finalTipoAgrupacion.slice(1);
             
             // --- 1. Gráfico de desconexiones por periodo (graficoFechas) ---
             const ctxFechas = document.getElementById("graficoFechas").getContext("2d");
@@ -344,14 +334,15 @@
 
             const dataFechas = {};
             filteredRows.forEach(r => {
-                const d = getDateObject(r[0]);
+                const d = getDateObject(r[0]); 
                 if (!d) return;
                 const cantidad = parseInt(r[10]) || 0; 
+                const mesData = (r[8] || "").trim().toLowerCase();
                 const dt = luxon.DateTime.fromJSDate(d);
                 let key;
 
-                if (finalTipoAgrupacion === "mes") key = (r[8] || "").trim().toLowerCase();
-                else if (finalTipoAgrupacion === "lineal") key = dt.toISODate();
+                if (isGlobalView) key = mesData; 
+                else if (finalTipoAgrupacion === "lineal") key = dt.toISODate(); 
                 else if (finalTipoAgrupacion === "semana") key = `Semana ${dt.weekNumber}`;
                 else if (finalTipoAgrupacion === "trimestre") key = `Q${Math.ceil(dt.month / 3)}`;
                 
@@ -361,7 +352,7 @@
 
             const labelsFechas = Object.keys(dataFechas).sort((a, b) => {
                 if (finalTipoAgrupacion === "lineal") return new Date(a) - new Date(b);
-                if (finalTipoAgrupacion === "mes") {
+                if (isGlobalView || finalTipoAgrupacion === "mes") {
                     return monthOrder[a] - monthOrder[b];
                 }
                 return a.localeCompare(b);
@@ -370,9 +361,12 @@
             chartFechas = new Chart(ctxFechas, {
                 type: "bar",
                 data: {
-                    labels: labelsFechas,
+                    labels: labelsFechas.map(l => {
+                        if (finalTipoAgrupacion === "lineal") return l;
+                        return l.charAt(0).toUpperCase() + l.slice(1);
+                    }),
                     datasets: [{
-                        label: `Total de Desconexión (${finalTipoAgrupacion.charAt(0).toUpperCase() + finalTipoAgrupacion.slice(1)})`,
+                        label: `Total de Desconexión (${chartTitleType})`,
                         data: labelsFechas.map(l => dataFechas[l]),
                         backgroundColor: "#FFC107", 
                         borderColor: "#FBBF24", 
@@ -386,7 +380,7 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: { beginAtZero: true, title: { display: true, text: "Cantidad de Eventos" } },
-                        x: { title: { display: true, text: finalTipoAgrupacion.charAt(0).toUpperCase() + finalTipoAgrupacion.slice(1) } }
+                        x: { title: { display: true, text: chartTitleType } } 
                     },
                     plugins: {
                         legend: { position: "top" },
@@ -404,7 +398,7 @@
                 plugins: [ChartDataLabels]
             });
 
-            // --- 2. Gráfico de región (graficoRegion) ---
+            // --- 2. Gráfico de región (graficoRegion) y Unidades Únicas ---
             const ctxRegion = document.getElementById("graficoRegion").getContext("2d");
             if (chartRegion) chartRegion.destroy();
 
@@ -414,12 +408,13 @@
             
             filteredRows.forEach(r => {
                 const region = (r[7] || "").trim(); 
-                const sede = (r[1] || "").trim(); 
-                const estado = (r[9] || "").trim().toLowerCase(); 
+                const sede = (r[1] || "").trim();   
+                const estado = String(r[9] || "").trim().toLowerCase(); 
 
                 if (!region || !sede) return;
                 
                 if (!regiones[region]) regiones[region] = { enLinea: new Set(), sinConexion: new Set() };
+                
                 if (estado === "en linea") regiones[region].enLinea.add(sede);
                 else if (estado === "sin conexion") regiones[region].sinConexion.add(sede);
                 
@@ -428,6 +423,7 @@
             });
 
             const regionLabels = Object.keys(regiones).sort();
+            
             chartRegion = new Chart(ctxRegion, {
                 type: "bar", 
                 data: {
@@ -454,7 +450,7 @@
                     maintainAspectRatio: false,
                     scales: {
                         x: { stacked: true, title: { display: true, text: "Región" } },
-                        y: { stacked: true, beginAtZero: true, title: { display: true, text: "Cantidad de Sedes únicas" } },
+                        y: { stacked: true, beginAtZero: true, title: { display: true, text: "Cantidad de Sedes Únicas" } },
                     },
                     plugins: {
                         legend: { position: "bottom" },
@@ -563,20 +559,19 @@
          */
         function renderTablaPorFiltro(mesSeleccionado) {
             const estadoSeleccionado = document.getElementById("estadoFiltro").value.trim().toLowerCase();
-            const rows = allRows.slice(1);
+            // ⬇️ CORRECCIÓN CLAVE: Omitir la fila de encabezados
+            const rows = allRows.slice(1); 
 
-            // 1. Filtrar por mes (Columna I, índice 8)
             const filteredByMonth = mesSeleccionado === "global"
                 ? rows
                 : rows.filter(r => (r[8] || "").trim().toLowerCase() === mesSeleccionado.trim().toLowerCase());
 
-            // 2. Aplicar filtro por estado (Columna J, índice 9)
             const finalFilteredRows = filteredByMonth.filter(r => {
-                const estado = (r[9] || "").trim().toLowerCase(); 
+                // ⬇️ CORREGIDO: r[9] ahora es definitivamente un string o una cadena vacía
+                const estado = String(r[9] || "").trim().toLowerCase();
                 return estadoSeleccionado === "todos" || estado === estadoSeleccionado;
             });
 
-            // 3. Agrupar por sede
             const sedes = {};
             finalFilteredRows.forEach(r => {
                 const sede = (r[1] || "").trim(); 
@@ -590,7 +585,6 @@
                 sedes[sede].totalCantidad += cantidad;
                 sedes[sede].count += 1;
 
-                // Sumar tiempo total de desconexión (convertir HH:MM:SS a segundos)
                 const parts = tiempo.split(":");
                 if (parts.length === 3) {
                     const [hh, mm, ss] = parts.map(Number);
@@ -598,7 +592,6 @@
                 }
             });
 
-            // 4. Procesar y ordenar
             const tablaBody = document.querySelector("#tablaDesconexion tbody");
             tablaBody.innerHTML = "";
 
@@ -611,19 +604,14 @@
                     return { sede, prom, tiempoStr, totalSegundos }; 
                 })
                 .sort((a, b) => {
-                    // Criterio 1: Ordenar por Prom. Cantidad (mayor a menor)
                     if (b.prom !== a.prom) {
                         return b.prom - a.prom; 
                     }
-                    // Criterio 2: Si el promedio es igual, ordenar por Tiempo Total de Desconexión (mayor a menor)
                     return b.totalSegundos - a.totalSegundos;
                 });
 
-            // 5. Renderizar: Top 10
             sedesOrdenadas.slice(0, 10).forEach(({ sede, prom, tiempoStr }, index) => {
                 const fila = document.createElement("tr");
-                
-                // Estilo visual de alerta si el promedio de cantidad es alto (>= 10)
                 const isTopProm = prom >= 10;
                 
                 fila.className = isTopProm ? 'alert-row' : (index % 2 === 0 ? 'bg-white' : 'bg-f4f4f4');
