@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Canguro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('Fachada.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .login-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        .error-message {
+            color: #dc2626;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="flex flex-col items-center mb-6">
+            <h1 class="text-2xl font-semibold text-gray-800 mb-4">Iniciar Sesión</h1>
+            <img 
+                src="logo-canguro.png" 
+                alt="Logo Canguro" 
+                class="w-auto h-16"
+                onerror="this.onerror=null; this.src='https://placehold.co/120x60/FFC107/333333?text=LOGO';"
+            />
+        </div>
+
+        <form id="loginForm">
+            <div class="mb-4">
+                <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    value="sguriat" 
+                    required 
+                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+                >
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    value="12345" 
+                    required 
+                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+                >
+            </div>
+            
+            <button 
+                type="submit" 
+                class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-gray-900 bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition duration-150"
+            >
+                Ingresar
+            </button>
+            <p id="errorMsg" class="error-message text-center"></p>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Si ya está autenticado, redirigir al dashboard
+            if (localStorage.getItem('isAuthenticated') === 'true') {
+                window.location.href = 'index.html';
+            }
+
+            const form = document.getElementById('loginForm');
+            const errorMsg = document.getElementById('errorMsg');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                // Credenciales de prueba
+                const VALID_USER = 'sguriat';
+                const VALID_PASS = '12345';
+
+                if (username === VALID_USER && password === VALID_PASS) {
+                    localStorage.setItem('isAuthenticated', 'true');
+                    localStorage.setItem('user', username); // Guarda el usuario
+                    window.location.href = 'index.html';
+                } else {
+                    errorMsg.textContent = 'Usuario o contraseña incorrectos.';
+                    localStorage.removeItem('isAuthenticated');
+                    localStorage.removeItem('user');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
